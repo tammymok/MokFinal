@@ -4,10 +4,12 @@ public class Game extends PApplet {
 	private int mode;
 	public static final int INTRO = 0, PLAY = 1, PAUSED = 2, GAMEOVER = 3;
 	private int size = 800;
-
+	private Enemy e;
+	
 	public void setup() {
 		size(size, size);
 		mode = 0;
+		e = new Enemy(this);
 	}
 
 	public void draw() {
@@ -15,7 +17,7 @@ public class Game extends PApplet {
 		if (mode == INTRO) {
 			displayIntro();
 		} else if (mode == PLAY) {
-
+			
 		} else if (mode == PAUSED) {
 			displayPaused();
 		} else if (mode == GAMEOVER) {

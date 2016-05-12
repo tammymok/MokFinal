@@ -19,6 +19,12 @@ public class Player {
 		totalPoints += num;
 	}
 
+	public int getLives(){
+		return lives;
+	}
+	public void decreaseLives(){
+		lives--;
+	}
 	public boolean isHit() {
 		return false;
 	}
