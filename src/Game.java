@@ -96,7 +96,8 @@ public class Game extends PApplet {
 		background(0);
 		fill(0, 20, 200);
 		textSize(50);
-		text("Space Invaders", size / 4, size / 2);
+		textAlign(CENTER);
+		text("Space Invaders", size / 2, size / 2);
 
 	}
 
