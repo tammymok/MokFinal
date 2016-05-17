@@ -56,6 +56,7 @@ public class Player {
 	}
 	
 	public void draw(int x, int y){
+		w.fill(255);
 		w.rect(x, y, 50, 50);
 		this.x = x;
 		this.y = y;

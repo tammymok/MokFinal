@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 import processing.core.PApplet;
+import processing.core.PShape;
 
 public class Game extends PApplet {
 	private static final int ROWS_OF_ENEMIES = 4;
@@ -14,7 +15,7 @@ public class Game extends PApplet {
 
 	public void setup() {
 		size(size, size);
-		mode = 0;
+		mode = INTRO;
 		Enemy[][] enemies = new Enemy[ROWS_OF_ENEMIES][COLS_OF_ENEMIES];
 		for (int row = 0; row < ROWS_OF_ENEMIES; row++) {
 			for (int col = 0; col < COLS_OF_ENEMIES; col++) {
@@ -29,7 +30,7 @@ public class Game extends PApplet {
 				}
 			}
 		}
-		player = new Player(this, size/2, size/2);
+		player = new Player(this, size / 2, size / 2);
 
 	}
 
@@ -38,11 +39,17 @@ public class Game extends PApplet {
 	}
 
 	public void draw() {
-		boolean bulletShot = false;
-
-		if (mode == INTRO) { //intro
+		boolean bulletShot = false; 
+		System.out.println("first "+mode);
+		
+		if (mode == INTRO) { // intro
 			displayIntro();
-		} else if (mode == PLAY) { //play
+			System.out.println("third "+mode);
+		}
+		if (mode == PLAY) { // play
+			
+			displayPlayScreen(); // set up
+
 			Bullet b = null;
 			if (keyPressed) {
 				if (key == CODED) {
@@ -52,25 +59,24 @@ public class Game extends PApplet {
 						bulletShot = true;
 						b = new Bullet(x, y, this);
 					} else if (keyCode == RIGHT) {
-						player.draw(x+=2, y); //fix
-						player.setX(x+=2);
+						player.draw(x += 2, y); // fix
+						player.setX(x += 2);
 					} else if (keyCode == LEFT) {
 						player.draw(x--, y);
-						player.setX(x-=2);
+						player.setX(x -= 2);
 					}
 				}
-				
-				if(key == 'p'||key == 'P'){
+
+				if (key == 'p' || key == 'P') {
 					mode = PAUSED;
 					displayPaused();
 				}
 			}
-			
-			
-			if(bulletShot == true){
+
+			if (bulletShot == true) {
 				int bulletX = b.getX();
 				int bulletY = b.getY();
-				b.draw(bulletX, bulletY+=5);
+				b.draw(bulletX, bulletY += 5);
 			}
 		} else if (mode == PAUSED) {
 			displayPaused();
@@ -78,7 +84,6 @@ public class Game extends PApplet {
 			displayGameOver();
 		}
 
-	
 	}
 
 	private void displayGameOver() {
@@ -92,13 +97,40 @@ public class Game extends PApplet {
 
 	}
 
+	private void displayPlayScreen() {
+		background(0);
+	}
+
 	private void displayIntro() {
 		background(0);
-		fill(0, 20, 200);
+		fill(0, 20, 230);
 		textSize(50);
 		textAlign(CENTER);
-		text("Space Invaders", size / 2, size / 2);
+		int x = size / 2;
+		text("Space Invaders", x, x); // both x b/c center
+		int diameter = 200;
+		int y = 3 * size / 4;
+		ellipseMode(CENTER);
+		ellipse(x, y, diameter, diameter);
+		textAlign(CENTER);
+		fill(255, 255, 255);
+		text("START", x, y + 20);
+		if ((isOverCircle(x, y, diameter) == true) && mousePressed) {
+			System.out.println("if statement working");
+			mode = PLAY;
+			System.out.println(mode);
+		}
 
+	}
+
+	boolean isOverCircle(int x, int y, int diameter) {
+		double xDist = x - mouseX;
+		double yDist = y - mouseY;
+		if (Math.sqrt((xDist * xDist) + (yDist * yDist)) < diameter / 2) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public void mousePressed() {
