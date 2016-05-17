@@ -11,3 +11,7 @@ To-Do:
 	- display all objects properly
 	- add methods for what to do when keys are pressed
 	
+Day 2: 5/16/16
+- Filled out some empty methods
+- created an array of enemies
+- figured out how to do collisions and where to put it
