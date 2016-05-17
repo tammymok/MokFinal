@@ -16,3 +16,11 @@ Day 2: 5/16/16
 - created an array of enemies
 - figured out how to do collisions and where to put it
 
+Day 3: 5/17/16
+-fixed display methods for different modes
+-display player and intro screen correctly
+-player is able to move 
+
+To-Do:
+-display shields and enemies
+-figure out why bullet display doesn't work
