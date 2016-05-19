@@ -6,7 +6,8 @@ import processing.core.PShape;
 public class Game extends PApplet {
 	private static final int ROWS_OF_ENEMIES = 4;
 	private static final int COLS_OF_ENEMIES = 10;
-
+	private static final int TIMER_CONSTANT = 10;
+	
 	private int mode;
 	public static final int INTRO = 0, PLAY = 1, PAUSED = 2, GAMEOVER = 3;
 	private int size = 800;
@@ -39,6 +40,8 @@ public class Game extends PApplet {
 
 	}
 
+	int timer = 0;
+
 	public void draw() {
 
 		if (mode == INTRO) { // intro
@@ -54,8 +57,14 @@ public class Game extends PApplet {
 					int x = player.getX();
 					int y = player.getY();
 					if (keyCode == UP) {
-						b = new Bullet(x, y, this);
-						bullets.add(b);
+						if (timer == 0) {
+							b = new Bullet(x, y, this);
+							bullets.add(b);
+							timer = TIMER_CONSTANT;
+						} else {
+							timer--;
+						}
+
 					} else if (keyCode == RIGHT) {
 						player.draw(x += 2, y); // fix
 						player.setX(x += 2);
@@ -64,13 +73,20 @@ public class Game extends PApplet {
 						player.setX(x -= 2);
 					}
 				}
-
-				shootBullets();
-				if (key == 'p' || key == 'P') {
-					mode = PAUSED;
-					displayPaused();
+				if (key == ' ') {
+					if (timer == 0) {
+						b = new Bullet(player.getX(), player.getY(), this);
+						bullets.add(b);
+						timer = TIMER_CONSTANT ;
+					} else {
+						timer--;
+					}
 				}
+
 			}
+			shootBullets();
+
+			checkForPaused();
 
 		} else if (mode == PAUSED) {
 			displayPaused();
@@ -78,10 +94,11 @@ public class Game extends PApplet {
 			displayGameOver();
 		}
 
+		stroke(0);
 	}
 
-	private void shootBullets(){
-		for(Bullet bullet : bullets){
+	private void shootBullets() {
+		for (Bullet bullet : bullets) {
 			int bulletX = bullet.getX();
 			int bulletY = bullet.getY();
 			bullet.draw(bulletX, bulletY -= 5);
@@ -89,6 +106,11 @@ public class Game extends PApplet {
 			bullet.setY(bulletY);
 		}
 	}
+
+	private void displayEnemies() {
+
+	}
+
 	private void displayGameOver() {
 		background(0);
 		fill(255, 255, 255);
@@ -97,12 +119,34 @@ public class Game extends PApplet {
 		text("GAME OVER", size / 2, size / 2);
 	}
 
+	private void checkForPaused() {
+		if (keyPressed) {
+			if (key == 'p' || key == 'P') {
+				mode = PAUSED;
+				displayPaused();
+			}
+		}
+	}
+
 	private void displayPaused() {
 		background(0);
-		fill(255,255,255);
+		fill(255, 255, 255);
 		textSize(60);
 		textAlign(CENTER);
-		text("GAME OVER", size / 2, size / 2);
+		text("PAUSED", size / 2, size / 2);
+		rectMode(CENTER);
+		int x = size / 2;
+		int y = 3 * size / 4;
+		int width = size / 2;
+		noFill();
+		stroke(0, 230, 20);
+		rect(x, y, width, 80);
+		fill(0, 230, 20);
+		textSize(40);
+		text("Click To Play", x, y + 30);
+		if ((isOverRect(x, y, width) == true) && mousePressed) {
+			mode = PLAY;
+		}
 	}
 
 	private void displayPlayScreen() {
@@ -129,6 +173,16 @@ public class Game extends PApplet {
 			mode = PLAY;
 		}
 
+	}
+
+	boolean isOverRect(int x, int y, int width) {
+		double xDist = x - mouseX;
+		double yDist = y - mouseY;
+		if (Math.sqrt((xDist * xDist) + (yDist * yDist)) < width / 2) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	boolean isOverCircle(int x, int y, int diameter) {
