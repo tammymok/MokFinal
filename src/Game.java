@@ -6,7 +6,11 @@ import processing.core.PShape;
 public class Game extends PApplet {
 	private static final int ROWS_OF_ENEMIES = 4;
 	private static final int COLS_OF_ENEMIES = 10;
-	private static final int TIMER_CONSTANT = 10;
+	private static final int TIMER_CONSTANT = 10;/*
+	private static final int UP = 0;
+	private static final int RIGHT = 1, LEFT = 2, SPACE = 3, P = 4;*/
+	
+	
 	
 	private int mode;
 	public static final int INTRO = 0, PLAY = 1, PAUSED = 2, GAMEOVER = 3;
@@ -14,6 +18,7 @@ public class Game extends PApplet {
 	private Enemy[][] enemies[][];
 	private Player player;
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	private Boolean[] keysPressed = {false, false, false, false, false};
 
 	public void setup() {
 		size(size, size);
@@ -108,7 +113,7 @@ public class Game extends PApplet {
 	}
 
 	private void displayEnemies() {
-
+		
 	}
 
 	private void displayGameOver() {
