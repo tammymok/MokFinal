@@ -12,6 +12,7 @@ public class Game extends PApplet {
 	private int size = 800;
 	private Enemy[][] enemies[][];
 	private Player player;
+	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 
 	public void setup() {
 		size(size, size);
@@ -39,7 +40,6 @@ public class Game extends PApplet {
 	}
 
 	public void draw() {
-		boolean bulletShot = false;
 
 		if (mode == INTRO) { // intro
 			displayIntro();
@@ -54,8 +54,8 @@ public class Game extends PApplet {
 					int x = player.getX();
 					int y = player.getY();
 					if (keyCode == UP) {
-						bulletShot = true;
 						b = new Bullet(x, y, this);
+						bullets.add(b);
 					} else if (keyCode == RIGHT) {
 						player.draw(x += 2, y); // fix
 						player.setX(x += 2);
@@ -65,20 +65,13 @@ public class Game extends PApplet {
 					}
 				}
 
+				shootBullets();
 				if (key == 'p' || key == 'P') {
 					mode = PAUSED;
 					displayPaused();
 				}
 			}
 
-			if (bulletShot == true) { // fixfixfixfixfixfix!
-				System.out.println("working");
-				int bulletX = b.getX();
-				int bulletY = b.getY();
-				b.draw(bulletX, bulletY += 5);
-				b.setX(bulletX);
-				b.setY(bulletY);
-			}
 		} else if (mode == PAUSED) {
 			displayPaused();
 		} else if (mode == GAMEOVER) {
@@ -87,15 +80,29 @@ public class Game extends PApplet {
 
 	}
 
+	private void shootBullets(){
+		for(Bullet bullet : bullets){
+			int bulletX = bullet.getX();
+			int bulletY = bullet.getY();
+			bullet.draw(bulletX, bulletY -= 5);
+			bullet.setX(bulletX);
+			bullet.setY(bulletY);
+		}
+	}
 	private void displayGameOver() {
 		background(0);
 		fill(255, 255, 255);
 		textSize(50);
-		text("GAME OVER", size / 4, size / 2);
+		textAlign(CENTER);
+		text("GAME OVER", size / 2, size / 2);
 	}
 
 	private void displayPaused() {
-
+		background(0);
+		fill(255,255,255);
+		textSize(60);
+		textAlign(CENTER);
+		text("GAME OVER", size / 2, size / 2);
 	}
 
 	private void displayPlayScreen() {
