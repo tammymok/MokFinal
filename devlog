@@ -24,3 +24,11 @@ Day 3: 5/17/16
 To-Do:
 -display shields and enemies
 -figure out why bullet display doesn't work
+
+Day 4: 5/19/16
+- fixed bullet display
+-figured out how to shoot while moving
+
+To-Do:
+-display enemies and shields
+-complete shooting while moving

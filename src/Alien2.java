@@ -4,12 +4,17 @@ public class Alien2 extends Enemy{
 
 	public Alien2(PApplet p){
 		super(p);
-		points = 20; // points for second level of enemies
+		points = 30; // points for second level of enemies
+		width = 25;
 		
 	}
 	@Override
-	public void draw(int x, int y) {
-		w.fill(100,20,20); //some color change later
-		w.rect(x, y, 25, 25);
+	public void draw() {
+		w.rectMode(Game.returnCENTER());
+
+		if (dead == false) {
+			w.fill(20, 20, 200); // some color change later
+			w.rect(x, y, width, 20);
+		}
 	}
 }

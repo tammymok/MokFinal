@@ -3,27 +3,32 @@ import java.util.ArrayList;
 import processing.core.PApplet;
 import processing.core.PShape;
 
+//check enemy boolean dead
+
 public class Game extends PApplet {
 	private static final int ROWS_OF_ENEMIES = 4;
 	private static final int COLS_OF_ENEMIES = 10;
 	private static final int TIMER_CONSTANT = 10;/*
-	private static final int UP = 0;
-	private static final int RIGHT = 1, LEFT = 2, SPACE = 3, P = 4;*/
-	
-	
-	
+													 * private static final int
+													 * UP = 0; private static
+													 * final int RIGHT = 1, LEFT
+													 * = 2, SPACE = 3, P = 4;
+													 */
+	public static final int SPEED_ENEMIES = 5;
 	private int mode;
 	public static final int INTRO = 0, PLAY = 1, PAUSED = 2, GAMEOVER = 3;
 	private int size = 800;
-	private Enemy[][] enemies[][];
+	private Enemy enemies[][];
 	private Player player;
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
-	private Boolean[] keysPressed = {false, false, false, false, false};
+	private Boolean[] keysPressed = { false, false, false, false, false };
+	private Boolean firstSetUp = true;
+	private int points = 0;
 
 	public void setup() {
 		size(size, size);
 		mode = INTRO;
-		Enemy[][] enemies = new Enemy[ROWS_OF_ENEMIES][COLS_OF_ENEMIES];
+		enemies = new Enemy[ROWS_OF_ENEMIES][COLS_OF_ENEMIES];
 		for (int row = 0; row < ROWS_OF_ENEMIES; row++) {
 			for (int col = 0; col < COLS_OF_ENEMIES; col++) {
 				if (row == 0) {
@@ -41,9 +46,6 @@ public class Game extends PApplet {
 
 	}
 
-	public void inCollision() {
-
-	}
 
 	int timer = 0;
 
@@ -55,7 +57,15 @@ public class Game extends PApplet {
 		if (mode == PLAY) { // play
 
 			displayPlayScreen(); // set up
-
+			areEnemiesShot(); // checks if enemies were shot and if yes, sets
+								// them to null
+			
+			displayScore();
+			if (firstSetUp == true) {
+				displayEnemies();
+				firstSetUp = false;
+			}
+			makeEnemiesMove();
 			Bullet b = null;
 			if (keyPressed) {
 				if (key == CODED) {
@@ -82,7 +92,7 @@ public class Game extends PApplet {
 					if (timer == 0) {
 						b = new Bullet(player.getX(), player.getY(), this);
 						bullets.add(b);
-						timer = TIMER_CONSTANT ;
+						timer = TIMER_CONSTANT;
 					} else {
 						timer--;
 					}
@@ -102,6 +112,51 @@ public class Game extends PApplet {
 		stroke(0);
 	}
 
+	private void displayScore(){
+		textAlign(CENTER);
+		textSize(50);
+		fill(20,20,230);
+		text(points, 7*size/8, 100);
+	}
+	private void makeEnemiesMove() {
+		Boolean reachedLeftEdge = false, reachedRightEdge = true;
+		int xVal = enemies[enemies.length - 1][enemies[0].length - 1].getX();
+		if (Math.abs(xVal - size) < 25) {
+			reachedLeftEdge = true;
+			reachedRightEdge = false;
+		} else if (Math.abs(enemies[enemies.length - 1][0].getX() - 0) < 25) {
+			reachedRightEdge = true;
+			reachedLeftEdge = false;
+		}
+
+		for (int r = 0; r < enemies.length; r++) {
+			for (int c = 0; c < enemies[0].length; c++) {
+				int x = enemies[r][c].getX();
+				int y = enemies[r][c].getY();
+				if (x != 0 && y != 0) {
+					if (reachedRightEdge == true) {
+						enemies[r][c].setX(x += SPEED_ENEMIES);
+					} else if (reachedLeftEdge == true)
+						enemies[r][c].setX(x -= SPEED_ENEMIES);
+				}
+			}
+		}
+	}
+
+	private void areEnemiesShot() {
+		for (int r = 0; r < enemies.length; r++) {
+			for (int c = 0; c < enemies[0].length; c++) {
+				int x = enemies[r][c].getX();
+				int y = enemies[r][c].getY();
+				if (isBulletOver(x, y, enemies[r][c].getWidth())) {
+					enemies[r][c].setDead(true);
+					points += enemies[r][c].getPoints();
+
+				}
+			}
+		}
+	}
+
 	private void shootBullets() {
 		for (Bullet bullet : bullets) {
 			int bulletX = bullet.getX();
@@ -112,8 +167,8 @@ public class Game extends PApplet {
 		}
 	}
 
-	private void displayEnemies() {
-		
+	public static int returnCENTER() {
+		return CENTER;
 	}
 
 	private void displayGameOver() {
@@ -158,6 +213,15 @@ public class Game extends PApplet {
 		background(0);
 		rectMode(CENTER);
 		player.draw(player.getX(), player.getY());
+		for (int r = 0; r < enemies.length; r++) {
+			for (int c = 0; c < enemies[0].length; c++) {
+				enemies[r][c].draw();
+			}
+		}
+		textAlign(CENTER);
+		fill(30,30,230);
+		textSize(20);
+		text("Press P for pause", size/4, 100);
 	}
 
 	private void displayIntro() {
@@ -178,6 +242,32 @@ public class Game extends PApplet {
 			mode = PLAY;
 		}
 
+	}
+
+	private void displayEnemies() {
+		int x = (size / 10) - 35, y = size - 350;
+		for (int r = 0; r < enemies.length; r++) {
+			for (int c = 0; c < enemies[0].length; c++) {
+				enemies[r][c].setX(x);
+				enemies[r][c].setY(y);
+				enemies[r][c].draw();
+				x += size / 15;
+			}
+			x = (size / 10) - 35;
+			y -= 75;
+		}
+	}
+
+	boolean isBulletOver(int x, int y, int width) {
+		for (Bullet b : bullets) {
+			double xDist = b.getX() - x;
+			double yDist = b.getY() - y;
+			if (Math.sqrt((xDist * xDist) + (yDist * yDist)) < width / 2) {
+				bullets.remove(b);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	boolean isOverRect(int x, int y, int width) {
