@@ -46,7 +46,6 @@ public class Game extends PApplet {
 
 	}
 
-
 	int timer = 0;
 
 	public void draw() {
@@ -59,7 +58,7 @@ public class Game extends PApplet {
 			displayPlayScreen(); // set up
 			areEnemiesShot(); // checks if enemies were shot and if yes, sets
 								// them to null
-			
+
 			displayScore();
 			if (firstSetUp == true) {
 				displayEnemies();
@@ -112,33 +111,32 @@ public class Game extends PApplet {
 		stroke(0);
 	}
 
-	private void displayScore(){
+	private void displayScore() {
 		textAlign(CENTER);
 		textSize(50);
-		fill(20,20,230);
-		text(points, 7*size/8, 100);
+		fill(0, 30, 255);
+		text(points, 7 * size / 8, 100);
 	}
-	private void makeEnemiesMove() {
-		Boolean reachedLeftEdge = false, reachedRightEdge = true;
+
+	private void makeEnemiesMove() { //fix removing edge causes enemies to run away
 		int xVal = enemies[enemies.length - 1][enemies[0].length - 1].getX();
 		if (Math.abs(xVal - size) < 25) {
-			reachedLeftEdge = true;
-			reachedRightEdge = false;
+			for (int r = 0; r < enemies.length; r++) {
+				for (int c = 0; c < enemies[0].length; c++) {
+					enemies[r][c].reverseDirection();
+				}
+			}
 		} else if (Math.abs(enemies[enemies.length - 1][0].getX() - 0) < 25) {
-			reachedRightEdge = true;
-			reachedLeftEdge = false;
+			for (int r = 0; r < enemies.length; r++) {
+				for (int c = 0; c < enemies[0].length; c++) {
+					enemies[r][c].reverseDirection();
+				}
+			}
 		}
 
 		for (int r = 0; r < enemies.length; r++) {
 			for (int c = 0; c < enemies[0].length; c++) {
-				int x = enemies[r][c].getX();
-				int y = enemies[r][c].getY();
-				if (x != 0 && y != 0) {
-					if (reachedRightEdge == true) {
-						enemies[r][c].setX(x += SPEED_ENEMIES);
-					} else if (reachedLeftEdge == true)
-						enemies[r][c].setX(x -= SPEED_ENEMIES);
-				}
+				enemies[r][c].move();
 			}
 		}
 	}
@@ -161,7 +159,7 @@ public class Game extends PApplet {
 		for (Bullet bullet : bullets) {
 			int bulletX = bullet.getX();
 			int bulletY = bullet.getY();
-			bullet.draw(bulletX, bulletY -= 5);
+			bullet.draw(bulletX, bulletY -= 7);
 			bullet.setX(bulletX);
 			bullet.setY(bulletY);
 		}
@@ -219,14 +217,14 @@ public class Game extends PApplet {
 			}
 		}
 		textAlign(CENTER);
-		fill(30,30,230);
+		fill(0, 30, 255);
 		textSize(20);
-		text("Press P for pause", size/4, 100);
+		text("Press P for pause", size / 4, 100);
 	}
 
 	private void displayIntro() {
 		background(0);
-		fill(0, 20, 230);
+		fill(0, 30, 255);
 		textSize(50);
 		textAlign(CENTER);
 		int x = size / 2;

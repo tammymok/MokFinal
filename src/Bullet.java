@@ -33,6 +33,6 @@ public class Bullet {
 
 	public void draw(int x, int y) {
 		w.fill(255, 255, 255);
-		w.rect(x, y, 10, 30);
+		w.rect(x, y, 7, 25);
 	}
 }

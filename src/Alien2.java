@@ -13,7 +13,7 @@ public class Alien2 extends Enemy{
 		w.rectMode(Game.returnCENTER());
 
 		if (dead == false) {
-			w.fill(20, 20, 200); // some color change later
+			w.fill(0, 30, 255); // some color change later
 			w.rect(x, y, width, 20);
 		}
 	}

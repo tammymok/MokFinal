@@ -32,3 +32,16 @@ Day 4: 5/19/16
 To-Do:
 -display enemies and shields
 -complete shooting while moving
+
+Day 5: 5/23/16
+- displayed block of enemies
+-figured out what to do once they're shot
+
+Day 6: 5/24/16
+-implemented what happens when enemies are shot
+-got them to move 
+-displayed points earned
+
+To-Do:
+-fix bug, when aliens on edge are removed, aliens run away
+-add images for spaceship, player and aliens

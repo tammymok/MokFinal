@@ -5,18 +5,33 @@ public class Enemy {
 	protected int speed;
 	protected PApplet w;
 	protected int x, y, width;
-	protected boolean dead; // add stuff!!!!!
+	protected boolean dead; 
+	protected int direction; // 1 is right, -1 is left
 
 	public Enemy(PApplet p) {
-		speed = 50; // some constant change later
+		speed = 3; // some constant change later
 		w = p;
 		dead = false;
+		direction = 1;
 	}
 
 	public Enemy(int speed, PApplet p) {
 		this.speed = speed;
 		w = p;
 		dead = false;
+		direction =1 ;
+	}
+
+	public int getDirection() {
+		return direction;
+	}
+
+	public void setDirection(int direction) {
+		this.direction = direction;
+	}
+	
+	public void reverseDirection(){
+		direction *= -1; 
 	}
 
 	public int getPoints() {
@@ -73,6 +88,9 @@ public class Enemy {
 		return width;
 	}
 
+	public void move(){
+		x+= speed*direction;
+	}
 	public void draw() {
 		w.rectMode(Game.returnCENTER());
 		if (dead == false) {
