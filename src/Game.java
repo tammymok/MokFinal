@@ -189,7 +189,7 @@ public class Game extends PApplet {
 			if (e.getX() > size) {
 				e.setDead(true);
 			}
-		}
+		} 
 	}
 
 	private void displayTime() {
