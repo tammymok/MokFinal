@@ -45,3 +45,11 @@ Day 6: 5/24/16
 To-Do:
 -fix bug, when aliens on edge are removed, aliens run away
 -add images for spaceship, player and aliens
+
+
+Added some more display methods for different modes
+Got enemies to shoot at player
+Displayed player lives
+Got special alien to visit once in a while
+Was able to display player with an image, unsuccessful with others(enemies)
+Added another mode, shows up whenever player gets shot, gives a buffer period of 3 seconds before starting game again

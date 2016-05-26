@@ -26,7 +26,7 @@ public class Game extends PApplet {
 	private Player player;
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	private ArrayList<Bullet> enemyBullets = new ArrayList<Bullet>();
-	private Boolean[] keysPressed = { false, false, false, false, false };
+	private Boolean[] keysPressed = { false, false, false, false, false }; //didn't have time to fully implement this
 	private Boolean firstSetUp = true;
 	private PImage playerImage;
 	private double startTime;
@@ -331,12 +331,6 @@ public class Game extends PApplet {
 		}
 	}
 
-	private void removeBullets() {
-		for (Bullet b : enemyBullets) {
-			if (b.getY() >= 7 * size / 8)
-				enemyBullets.remove(b);
-		}
-	}
 
 	private void displayGameOver() {
 		background(0);
