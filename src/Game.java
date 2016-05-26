@@ -26,13 +26,7 @@ public class Game extends PApplet {
 	private Player player;
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	private ArrayList<Bullet> enemyBullets = new ArrayList<Bullet>();
-	private Boolean[] keysPressed = { false, false, false, false, false }; // didn't
-																			// have
-																			// time
-																			// to
-																			// fully
-																			// implement
-																			// this
+	private Boolean[] keysPressed = { false, false, false, false, false }; // didn't have time to finish this
 	private Boolean firstSetUp = true;
 	private PImage playerImage;
 	private double startTime;
@@ -196,13 +190,7 @@ public class Game extends PApplet {
 		textSize(20);
 		textAlign(CENTER);
 		fill(0, 30, 255);
-		text(new DecimalFormat("##.#").format(seconds) + "s left", 5 * size / 8, 100); // formats
-																						// the
-																						// double,
-																						// displays
-																						// up
-																						// to
-																						// tenths
+		text(new DecimalFormat("##.#").format(seconds) + "s left", 5 * size / 8, 100); // formats the double, displays up to tenths
 	}
 
 	private int getRightMostColumn() {
@@ -335,7 +323,7 @@ public class Game extends PApplet {
 	private void enemiesAddBullets() {
 		for (int r = 0; r < enemies.length; r++) {
 			for (int c = 0; c < enemies[0].length; c++) {
-				int random = (int) (Math.random() * 1500);
+				int random = (int) (Math.random() * 1250);
 				if (random < enemyBulletThreshold && enemies[r][c].getX() != 0) {
 					Bullet b = new Bullet(enemies[r][c].getX(), enemies[r][c].getY(), this);
 					enemyBullets.add(b);
