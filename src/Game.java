@@ -1,6 +1,8 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PShape;
 
 //check enemy boolean dead
@@ -14,19 +16,29 @@ public class Game extends PApplet {
 													 * final int RIGHT = 1, LEFT
 													 * = 2, SPACE = 3, P = 4;
 													 */
+	private static final int TIME_ALLOWED_TO_PLAY = 60; // one minute before
+														// game ends
 	public static final int SPEED_ENEMIES = 5;
 	private int mode;
-	public static final int INTRO = 0, PLAY = 1, PAUSED = 2, GAMEOVER = 3;
+	public static final int INTRO = 0, PLAY = 1, PAUSED = 2, GAMEOVER = 3, LOSTLIFE = 4;
 	private int size = 800;
 	private Enemy enemies[][];
 	private Player player;
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	private ArrayList<Bullet> enemyBullets = new ArrayList<Bullet>();
 	private Boolean[] keysPressed = { false, false, false, false, false };
 	private Boolean firstSetUp = true;
-	private int points = 0;
+	private PImage playerImage;
+	private double startTime;
+	private double seconds;
+	private int specialAlienThreshold = 10;
+	private ArrayList<Enemy> specialAliens = new ArrayList<Enemy>();
+	private int enemyBulletThreshold = 1;
+	private int countdown;
 
 	public void setup() {
 		size(size, size);
+		imageMode(CENTER);
 		mode = INTRO;
 		enemies = new Enemy[ROWS_OF_ENEMIES][COLS_OF_ENEMIES];
 		for (int row = 0; row < ROWS_OF_ENEMIES; row++) {
@@ -43,7 +55,7 @@ public class Game extends PApplet {
 			}
 		}
 		player = new Player(this, size / 2, 7 * size / 8);
-
+		playerImage = loadImage("player.png");
 	}
 
 	int timer = 0;
@@ -52,19 +64,29 @@ public class Game extends PApplet {
 
 		if (mode == INTRO) { // intro
 			displayIntro();
+			countdown = 3 + millis();
 		}
 		if (mode == PLAY) { // play
-
-			displayPlayScreen(); // set up
-			areEnemiesShot(); // checks if enemies were shot and if yes, sets
-								// them to null
-
-			displayScore();
 			if (firstSetUp == true) {
 				displayEnemies();
 				firstSetUp = false;
+				startTime = millis() / 1000;
 			}
+
+			seconds = TIME_ALLOWED_TO_PLAY + startTime - millis() / (double) 1000;
+			displayPlayScreen(); // set updisplayScore();
+			displayTime();
+			displayScore();
+			displayLives();
+
+			areEnemiesShot(); // checks if enemies were shot and if yes, sets
+								// them to null
+			createSpecialAlienIfPossible();
 			makeEnemiesMove();
+			enemiesAddBullets();
+			enemiesShootBullets();
+
+			isPlayerShot();
 			Bullet b = null;
 			if (keyPressed) {
 				if (key == CODED) {
@@ -80,11 +102,11 @@ public class Game extends PApplet {
 						}
 
 					} else if (keyCode == RIGHT) {
-						player.draw(x += 2, y); // fix
-						player.setX(x += 2);
+						player.setX(x += 4);
+						displayPlayer();
 					} else if (keyCode == LEFT) {
-						player.draw(x--, y);
-						player.setX(x -= 2);
+						player.setX(x -= 4);
+						displayPlayer();
 					}
 				}
 				if (key == ' ') {
@@ -101,32 +123,130 @@ public class Game extends PApplet {
 			shootBullets();
 
 			checkForPaused();
+			if (TIME_ALLOWED_TO_PLAY - millis() / (double) 1000 <= 0) {
+				mode = GAMEOVER;
+			}
 
 		} else if (mode == PAUSED) {
 			displayPaused();
 		} else if (mode == GAMEOVER) {
 			displayGameOver();
+		} else if (mode == LOSTLIFE) {
+			background(0);
+			fill(255, 255, 255);
+			textAlign(CENTER);
+			textSize(50);
+			text("YOU LOST A LIFE!", size / 2, size / 3);
+			text("Lives Remaining: " + player.getLives(), size / 2, 2 * size / 5);
+			int num = 3 - ((millis() - countdown) / 1000);
+			text("Starting in " + num + " seconds", size / 2, 3 * size / 4);
+
+			if (num <= 0)
+				mode = PLAY;
 		}
 
 		stroke(0);
+	}
+
+	public static int returnCENTER() {
+		return CENTER;
+	}
+
+	private void createSpecialAlienIfPossible() {
+		int random = (int) (Math.random() * 10000);
+		if (random < specialAlienThreshold) {
+			SpecialAlien a = new SpecialAlien(4, this); // 4 is the speed
+			a.setY(150);
+			specialAliens.add(a);
+		}
+	}
+
+	private void moveSpecialAliens() {
+		for (Enemy e : specialAliens) {
+			e.move();
+			e.draw();
+			if (e.getX() > size) {
+				e.setDead(true);
+			}
+		}
+	}
+
+	private void displayTime() {
+		textSize(20);
+		textAlign(CENTER);
+		fill(0, 30, 255);
+		text(new DecimalFormat("##.#").format(seconds) + "s left", 5 * size / 8, 100); // formats
+																						// the
+																						// double,
+																						// displays
+																						// up
+																						// to
+																						// tenths
+	}
+
+	private int getRightMostColumn() {
+		int col = 0;
+		for (int r = 0; r < enemies.length; r++) {
+			for (int c = 0; c < enemies[0].length; c++) {
+				if (enemies[r][c].getX() != 0 && c > col) {
+					col = c;
+				}
+			}
+		}
+		return col;
+	}
+
+	private int getLeftMostColumn() {
+		int col = enemies.length - 1;
+		for (int r = 0; r < enemies.length; r++) {
+			for (int c = 0; c < enemies[0].length; c++) {
+				if (enemies[r][c].getX() != 0 && c < col) {
+					col = c;
+				}
+			}
+		}
+		return col;
+	}
+
+	private int getRightRow() {
+		for (int r = 0; r < enemies.length; r++) {
+			if (enemies[r][getRightMostColumn()].getX() != 0) {
+				return r;
+			}
+		}
+		return enemies.length - 1;
+	}
+
+	private int getLeftRow() {
+		for (int r = 0; r < enemies.length; r++) {
+			if (enemies[r][getLeftMostColumn()].getX() != 0) {
+				return r;
+			}
+		}
+		return enemies.length - 1;
 	}
 
 	private void displayScore() {
 		textAlign(CENTER);
 		textSize(50);
 		fill(0, 30, 255);
-		text(points, 7 * size / 8, 100);
+		text(player.getTotalPoints(), 7 * size / 8, 100);
 	}
 
-	private void makeEnemiesMove() { //fix removing edge causes enemies to run away
-		int xVal = enemies[enemies.length - 1][enemies[0].length - 1].getX();
+	private void makeEnemiesMove() { // fix removing edge causes enemies to run
+										// away
+		int xVal = enemies[getRightRow()][getRightMostColumn()].getX(); // checking
+																		// right
+																		// side
 		if (Math.abs(xVal - size) < 25) {
 			for (int r = 0; r < enemies.length; r++) {
 				for (int c = 0; c < enemies[0].length; c++) {
 					enemies[r][c].reverseDirection();
 				}
 			}
-		} else if (Math.abs(enemies[enemies.length - 1][0].getX() - 0) < 25) {
+		} else if (Math.abs(enemies[getLeftRow()][getLeftMostColumn()].getX() - 0) < 25) { // checking
+																							// left
+																							// side
 			for (int r = 0; r < enemies.length; r++) {
 				for (int c = 0; c < enemies[0].length; c++) {
 					enemies[r][c].reverseDirection();
@@ -139,6 +259,8 @@ public class Game extends PApplet {
 				enemies[r][c].move();
 			}
 		}
+		moveSpecialAliens();
+
 	}
 
 	private void areEnemiesShot() {
@@ -146,27 +268,74 @@ public class Game extends PApplet {
 			for (int c = 0; c < enemies[0].length; c++) {
 				int x = enemies[r][c].getX();
 				int y = enemies[r][c].getY();
-				if (isBulletOver(x, y, enemies[r][c].getWidth())) {
+				if (isBulletOver(x, y, enemies[r][c].getWidth(), bullets)) {
 					enemies[r][c].setDead(true);
-					points += enemies[r][c].getPoints();
+					player.addToTotalPoints(enemies[r][c].getPoints());
 
 				}
+			}
+		}
+		for (Enemy e : specialAliens) {
+			if (isBulletOver(e.getX(), e.getY(), e.getWidth(), bullets)) {
+				e.setDead(true);
+				player.addToTotalPoints(e.getPoints());
+			}
+		}
+	}
+
+	private void displayLives() {
+		PImage life = loadImage("player.png");
+		imageMode(CENTER);
+		int x = 50;
+		for (int i = 0; i < player.getLives(); i++) {
+			image(life, x, 50);
+			x += 50;
+		}
+	}
+
+	private void isPlayerShot() {
+		if (isBulletOver(player.getX(), player.getY(), player.getWidth(), enemyBullets)) {
+			player.decreaseLives();
+			if (player.getLives() <= 0)
+				mode = GAMEOVER;
+			else {
+				countdown = 3 + millis();
+				mode = LOSTLIFE;
 			}
 		}
 	}
 
 	private void shootBullets() {
 		for (Bullet bullet : bullets) {
-			int bulletX = bullet.getX();
-			int bulletY = bullet.getY();
-			bullet.draw(bulletX, bulletY -= 7);
-			bullet.setX(bulletX);
-			bullet.setY(bulletY);
+			bullet.setY(bullet.getY() - 9);
+			bullet.draw();
 		}
 	}
 
-	public static int returnCENTER() {
-		return CENTER;
+	private void enemiesAddBullets() {
+		for (int r = 0; r < enemies.length; r++) {
+			for (int c = 0; c < enemies[0].length; c++) {
+				int random = (int) (Math.random() * 1500);
+				if (random < enemyBulletThreshold && enemies[r][c].getX() != 0) {
+					Bullet b = new Bullet(enemies[r][c].getX(), enemies[r][c].getY(), this);
+					enemyBullets.add(b);
+				}
+			}
+		}
+	}
+
+	private void enemiesShootBullets() {
+		for (Bullet b : enemyBullets) {
+			b.setY(b.getY() + 7);
+			b.draw();
+		}
+	}
+
+	private void removeBullets() {
+		for (Bullet b : enemyBullets) {
+			if (b.getY() >= 7 * size / 8)
+				enemyBullets.remove(b);
+		}
 	}
 
 	private void displayGameOver() {
@@ -175,6 +344,16 @@ public class Game extends PApplet {
 		textSize(50);
 		textAlign(CENTER);
 		text("GAME OVER", size / 2, size / 2);
+
+		fill(0, 230, 20);
+		text("Your score:" + player.getTotalPoints(), size / 2, 3 * size / 4);
+
+		if (player.getLives() <= 0) {
+			fill(255, 30, 0);
+			text("YOU DIED TOO MANY TIMES!", size / 2, size / 3);
+		} else{
+			text("TIME'S UP", size / 2, size / 3);
+		}
 	}
 
 	private void checkForPaused() {
@@ -202,15 +381,23 @@ public class Game extends PApplet {
 		fill(0, 230, 20);
 		textSize(40);
 		text("Click To Play", x, y + 30);
+		fill(0, 20, 255);
+		textSize(30);
+		text("Current Score: " + player.getTotalPoints(), x, y - 110);
+		text("Time Left: " + new DecimalFormat("##.#").format(seconds) + "s.", x, y - 80);
 		if ((isOverRect(x, y, width) == true) && mousePressed) {
 			mode = PLAY;
 		}
 	}
 
+	private void displayPlayer() { // fix
+		image(playerImage, player.getX(), player.getY());
+	}
+
 	private void displayPlayScreen() {
 		background(0);
 		rectMode(CENTER);
-		player.draw(player.getX(), player.getY());
+		displayPlayer();
 		for (int r = 0; r < enemies.length; r++) {
 			for (int c = 0; c < enemies[0].length; c++) {
 				enemies[r][c].draw();
@@ -219,7 +406,7 @@ public class Game extends PApplet {
 		textAlign(CENTER);
 		fill(0, 30, 255);
 		textSize(20);
-		text("Press P for pause", size / 4, 100);
+		text("Press P for pause", size / 6, 100);
 	}
 
 	private void displayIntro() {
@@ -256,7 +443,7 @@ public class Game extends PApplet {
 		}
 	}
 
-	boolean isBulletOver(int x, int y, int width) {
+	boolean isBulletOver(int x, int y, int width, ArrayList<Bullet> bullets) {
 		for (Bullet b : bullets) {
 			double xDist = b.getX() - x;
 			double yDist = b.getY() - y;

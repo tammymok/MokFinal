@@ -6,13 +6,15 @@ public class Player {
 	private int totalPoints;
 	private int x;
 	private int y;
-
+	private int width;
+	
 	public Player(PApplet p, int x, int y) {
 		w = p;
 		this.x = x;
 		this.y = y;
 		lives = 3; // default number of lives
 		totalPoints = 0;
+		width = 40;
 	}
 
 	public void setX(int x) {
@@ -23,10 +25,9 @@ public class Player {
 		this.y = y;
 	}
 
-	public void shoot() {
-
+	public int getWidth(){
+		return width;
 	}
-
 	public int getTotalPoints() {
 		return totalPoints;
 	}
@@ -57,7 +58,7 @@ public class Player {
 	
 	public void draw(int x, int y){
 		w.fill(255);
-		w.rect(x, y, 40, 40);
+		w.rect(x, y, width, 40);
 		this.x = x;
 		this.y = y;
 	}

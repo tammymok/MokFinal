@@ -31,7 +31,7 @@ public class Bullet {
 		return false;
 	}
 
-	public void draw(int x, int y) {
+	public void draw() {
 		w.fill(255, 255, 255);
 		w.rect(x, y, 7, 25);
 	}

@@ -7,6 +7,7 @@ public class Enemy {
 	protected int x, y, width;
 	protected boolean dead; 
 	protected int direction; // 1 is right, -1 is left
+	protected String name = "";
 
 	public Enemy(PApplet p) {
 		speed = 3; // some constant change later
@@ -39,7 +40,7 @@ public class Enemy {
 	}
 
 
-	public boolean isDead() {
+	public boolean getDead() {
 		return dead;
 	}
 
@@ -90,6 +91,9 @@ public class Enemy {
 
 	public void move(){
 		x+= speed*direction;
+	}
+	public String getImageName(){
+		return name;
 	}
 	public void draw() {
 		w.rectMode(Game.returnCENTER());

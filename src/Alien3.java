@@ -5,7 +5,7 @@ public class Alien3 extends Enemy {
 	public Alien3(PApplet p) {
 		super(p);
 		points = 20; // points for third level of aliens
-		width = 20;
+		width = 30;
 	}
 
 	@Override
