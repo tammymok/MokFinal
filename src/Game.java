@@ -26,15 +26,22 @@ public class Game extends PApplet {
 	private Player player;
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	private ArrayList<Bullet> enemyBullets = new ArrayList<Bullet>();
-	private Boolean[] keysPressed = { false, false, false, false, false }; //didn't have time to fully implement this
+	private Boolean[] keysPressed = { false, false, false, false, false }; // didn't
+																			// have
+																			// time
+																			// to
+																			// fully
+																			// implement
+																			// this
 	private Boolean firstSetUp = true;
 	private PImage playerImage;
 	private double startTime;
 	private double seconds;
-	private int specialAlienThreshold = 10;
+	private int specialAlienThreshold = 5;
 	private ArrayList<Enemy> specialAliens = new ArrayList<Enemy>();
 	private int enemyBulletThreshold = 1;
 	private int countdown;
+	private PImage life;
 
 	public void setup() {
 		size(size, size);
@@ -55,7 +62,8 @@ public class Game extends PApplet {
 			}
 		}
 		player = new Player(this, size / 2, 7 * size / 8);
-		playerImage = loadImage("player.png");
+		playerImage = loadImage("../assets/player.png");
+		life = loadImage("../assets/player.png");
 	}
 
 	int timer = 0;
@@ -87,6 +95,8 @@ public class Game extends PApplet {
 			enemiesShootBullets();
 
 			isPlayerShot();
+			
+			removeBullets();
 			Bullet b = null;
 			if (keyPressed) {
 				if (key == CODED) {
@@ -137,7 +147,10 @@ public class Game extends PApplet {
 			textAlign(CENTER);
 			textSize(50);
 			text("YOU LOST A LIFE!", size / 2, size / 3);
+			fill(0, 230, 20);
 			text("Lives Remaining: " + player.getLives(), size / 2, 2 * size / 5);
+
+			fill(255, 255, 255);
 			int num = 3 - ((millis() - countdown) / 1000);
 			text("Starting in " + num + " seconds", size / 2, 3 * size / 4);
 
@@ -150,6 +163,14 @@ public class Game extends PApplet {
 
 	public static int returnCENTER() {
 		return CENTER;
+	}
+
+	private void removeBullets() {
+		for(int i = 0; i< enemyBullets.size();i++){
+			if (enemyBullets.get(i).getY() >= 7 * size / 8) {
+				enemyBullets.remove(i);
+			}
+		}
 	}
 
 	private void createSpecialAlienIfPossible() {
@@ -284,7 +305,6 @@ public class Game extends PApplet {
 	}
 
 	private void displayLives() {
-		PImage life = loadImage("player.png");
 		imageMode(CENTER);
 		int x = 50;
 		for (int i = 0; i < player.getLives(); i++) {
@@ -331,7 +351,6 @@ public class Game extends PApplet {
 		}
 	}
 
-
 	private void displayGameOver() {
 		background(0);
 		fill(255, 255, 255);
@@ -345,7 +364,7 @@ public class Game extends PApplet {
 		if (player.getLives() <= 0) {
 			fill(255, 30, 0);
 			text("YOU DIED TOO MANY TIMES!", size / 2, size / 3);
-		} else{
+		} else {
 			text("TIME'S UP", size / 2, size / 3);
 		}
 	}
@@ -468,6 +487,5 @@ public class Game extends PApplet {
 			return false;
 		}
 	}
-
 
 }
