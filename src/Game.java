@@ -31,7 +31,7 @@ public class Game extends PApplet {
 	private PImage playerImage;
 	private double startTime;
 	private double seconds;
-	private int specialAlienThreshold = 5;
+	private int specialAlienThreshold = 7;
 	private ArrayList<Enemy> specialAliens = new ArrayList<Enemy>();
 	private int enemyBulletThreshold = 1;
 	private int countdown;
@@ -127,7 +127,7 @@ public class Game extends PApplet {
 			shootBullets();
 
 			checkForPaused();
-			if (TIME_ALLOWED_TO_PLAY - millis() / (double) 1000 <= 0) {
+			if ((TIME_ALLOWED_TO_PLAY -( millis() / (double) 1000)) <= 0) {
 				mode = GAMEOVER;
 			}
 
