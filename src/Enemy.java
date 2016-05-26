@@ -81,10 +81,6 @@ public class Enemy {
 		return false;
 	}
 
-	public void disappear() {
-
-	}
-
 	public int getWidth() {
 		return width;
 	}
