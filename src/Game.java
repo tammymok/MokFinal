@@ -469,7 +469,5 @@ public class Game extends PApplet {
 		}
 	}
 
-	public void mousePressed() {
 
-	}
 }
